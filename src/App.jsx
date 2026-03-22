@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import './App.css'
 import './theme.css'
 import profilePhoto from './srinivas.jpg.jpeg'
@@ -8,6 +9,12 @@ import { CanvasText } from './components/ui/CanvasText'
 import { LayoutTextFlip } from './components/ui/LayoutTextFlip'
 
 function App() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
+  const handleNavClick = () => {
+    setIsMobileMenuOpen(false)
+  }
+
   return (
     <div className="site-shell">
       <div className="background-grid" aria-hidden="true" />
@@ -22,12 +29,27 @@ function App() {
               />
             </p>
           </div>
-          <nav>
-            <a href="#about">About</a>
-            <a href="#experience">Experience</a>
-            <a href="#techstuff">TechStuff</a>
-            <a href="#projects">Projects</a>
-            <a href="#contact">Contact</a>
+          <button
+            type="button"
+            className="menu-toggle"
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="site-navigation"
+            aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            onClick={() => setIsMobileMenuOpen((open) => !open)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+          <nav
+            id="site-navigation"
+            className={isMobileMenuOpen ? 'site-nav site-nav--open' : 'site-nav'}
+          >
+            <a href="#about" onClick={handleNavClick}>About</a>
+            <a href="#experience" onClick={handleNavClick}>Experience</a>
+            <a href="#techstuff" onClick={handleNavClick}>TechStuff</a>
+            <a href="#projects" onClick={handleNavClick}>Projects</a>
+            <a href="#contact" onClick={handleNavClick}>Contact</a>
           </nav>
         </header>
 
@@ -45,7 +67,7 @@ function App() {
           <div className="profile-content">
             <h2>Narsingoju Sai Srinivasu</h2>
             <div className="cta-row">
-              <a href="mailto:narsingojusaisrinivasu@gmail.com" className="btn btn-primary">
+              <a href="#contact" className="btn btn-primary">
                 Connect with Me
               </a>
               <a href="#profile" className="btn btn-secondary">
