@@ -5,14 +5,45 @@ import profilePhoto from './srinivas.jpg.jpeg'
 import budgetTrackerPreview from './assets/budget-tracker-preview.png'
 import searchFilterPreview from './assets/search-filter-preview.png'
 import todoListPreview from './assets/todo-list-preview.png'
-import { CanvasText } from './components/ui/CanvasText'
 import { LayoutTextFlip } from './components/ui/LayoutTextFlip'
 
 function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [contactResult, setContactResult] = useState('')
+  const [isSubmittingContact, setIsSubmittingContact] = useState(false)
 
   const handleNavClick = () => {
     setIsMobileMenuOpen(false)
+  }
+
+  const handleContactSubmit = async (event) => {
+    event.preventDefault()
+    setIsSubmittingContact(true)
+    setContactResult('')
+
+    const form = event.target
+    const formData = new FormData(form)
+    formData.append('access_key', '855b2d9a-44b9-449e-807f-86b9f853388f')
+
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setContactResult('Success! Your message has been sent.')
+        form.reset()
+      } else {
+        setContactResult('Error. Please try again.')
+      }
+    } catch (error) {
+      setContactResult('Network error. Please try again.')
+    } finally {
+      setIsSubmittingContact(false)
+    }
   }
 
   return (
@@ -20,53 +51,52 @@ function App() {
       <div className="background-grid" aria-hidden="true" />
       <div className="site">
         <header className="topbar">
-          <div>
-            <p className="brand">
-              <CanvasText
-                text="N Sai Srinivas"
-                colors={['#f1e3ca', '#e7d7bd', '#d6c3a5', '#8e7a61']}
-                animationDuration={14}
-              />
-            </p>
+          <div className="topbar__inner">
+            <a href="#profile" className="topbar__brand brand" onClick={handleNavClick}>
+              <span className="brand__primary">Sai</span>
+              <span className="brand__accent">Srinivas</span>
+            </a>
+            <button
+              type="button"
+              className={isMobileMenuOpen ? 'menu-toggle menu-toggle--open' : 'menu-toggle'}
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="site-navigation"
+              aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              onClick={() => setIsMobileMenuOpen((open) => !open)}
+            >
+              <span />
+              <span />
+              <span />
+            </button>
+            <nav
+              id="site-navigation"
+              className={isMobileMenuOpen ? 'site-nav site-nav--open' : 'site-nav'}
+            >
+              <a href="#about" onClick={handleNavClick}>About</a>
+              <a href="#experience" onClick={handleNavClick}>Experience</a>
+              <a href="#techstuff" onClick={handleNavClick}>Skills</a>
+              <a href="#projects" onClick={handleNavClick}>Projects</a>
+              <a href="#contact" onClick={handleNavClick}>Contact</a>
+            </nav>
           </div>
-          <button
-            type="button"
-            className="menu-toggle"
-            aria-expanded={isMobileMenuOpen}
-            aria-controls="site-navigation"
-            aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-            onClick={() => setIsMobileMenuOpen((open) => !open)}
-          >
-            <span />
-            <span />
-            <span />
-          </button>
-          <nav
-            id="site-navigation"
-            className={isMobileMenuOpen ? 'site-nav site-nav--open' : 'site-nav'}
-          >
-            <a href="#about" onClick={handleNavClick}>About</a>
-            <a href="#experience" onClick={handleNavClick}>Experience</a>
-            <a href="#techstuff" onClick={handleNavClick}>TechStuff</a>
-            <a href="#projects" onClick={handleNavClick}>Projects</a>
-            <a href="#contact" onClick={handleNavClick}>Contact</a>
-          </nav>
         </header>
 
-        <section id="profile" className="profile-card">
-          <div className="profile-photo">
-            <div className="photo-frame">
-              <div className="photo-glow" />
+        <section id="profile" className="profile-card hero-header">
+          <div className="hero-header__media">
+            <div className="hero-header__orbit hero-header__orbit--one" aria-hidden="true" />
+            <div className="hero-header__orbit hero-header__orbit--two" aria-hidden="true" />
+            <div className="hero-header__image-shell">
+              <div className="photo-glow hero-header__glow" />
               <img
-                className="profile-image"
+                className="hero-header__image"
                 src={profilePhoto}
                 alt="Portrait of Narsingoju Sai Srinivasu"
               />
             </div>
           </div>
-          <div className="profile-content">
+          <div className="profile-content hero-header__content">
             <h2>Narsingoju Sai Srinivasu</h2>
-            <div className="cta-row">
+            <div className="cta-row hero-header__actions">
               <a href="#contact" className="btn btn-primary">
                 Connect with Me
               </a>
@@ -238,19 +268,19 @@ function App() {
 
         <section id="contact" className="contact-section">
           <h2 className="contact-section__title">Contact</h2>
-          <form className="contact-form">
+          <form className="contact-form" onSubmit={handleContactSubmit}>
             <span className="contact-form__group">
               <label htmlFor="name" className="contact-form__label">
                 Name
               </label>
-              <input type="text" name="name" id="name" placeholder="Your name" />
+              <input type="text" name="name" id="name" placeholder="Your name" required />
             </span>
 
             <span className="contact-form__group">
               <label htmlFor="email" className="contact-form__label">
                 Email
               </label>
-              <input type="email" name="email" id="email" placeholder="you@example.com" />
+              <input type="email" name="email" id="email" placeholder="you@example.com" required />
             </span>
 
             <span className="contact-form__group">
@@ -262,10 +292,18 @@ function App() {
                 id="message"
                 rows="5"
                 placeholder="Tell me about your project or opportunity"
+                required
               />
             </span>
 
-            <input className="contact-form__submit" type="submit" value="Send Message" />
+            <button className="contact-form__submit" type="submit" disabled={isSubmittingContact}>
+              {isSubmittingContact ? 'Sending...' : 'Send Message'}
+            </button>
+            {contactResult ? (
+              <p className="contact-form__result" role="status">
+                {contactResult}
+              </p>
+            ) : null}
             <span className="contact-form__note">
               Prefer email? <a href="mailto:narsingojusaisrinivasu@gmail.com">Reach me directly</a>
             </span>
